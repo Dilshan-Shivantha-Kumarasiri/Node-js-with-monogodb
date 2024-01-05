@@ -1,0 +1,28 @@
+tsc --init  /- initialize typescript to out project
+
+---- dependancies we nee to initialize
+    npm i -D nodemon ts-node typescript @types/cors @types/express @types/node
+
+----- insatalling an application -----
+$ npm i cors express mongoose
+
+
+---- type script configuration ----
+
+*"moduleResolution": "node",
+*    "module": "NodeNext",                                /* Specify what module code is generated. */
+*     "baseUrl": "src",
+"sourceMap": true,/* Specify the base directory to resolve non-relative module names. */
+"outDir": "dist",
+ "noImplicitAny": true,
+
+ "include": ["src/**/*"]
+
+
+ ------- config nodemon ------
+
+ {
+   "watch": ["src"],
+   "ext" : ".ts,.js",
+   "exec": "ts-node ./src/index.ts" says compile to the ts node
+ }
