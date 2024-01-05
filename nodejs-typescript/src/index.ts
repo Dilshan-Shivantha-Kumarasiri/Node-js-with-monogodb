@@ -1,7 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
-import mongoose, {mongo} from "mongoose";
-
+import mongoose from "mongoose";
+import userModel from "./models/user.model";
+import UserModel from "./models/user.model";
 //invoking the express
 const app =express();
 
@@ -41,15 +42,24 @@ app.get('/user/all', (req:express.Request , res:express.Response) => {
 *
 *Crate new user
 */
-app.post('/user' ,(req:express.Request , res: express.Response) =>{
+app.post('/user' ,async (req:express.Request , res: express.Response) =>{
 
     //if you want to install out 3rd party library because after 2020 we can not use this directly
     //Because it needs to convert to the format for that we use body-parser lib
     //console.log(req.body);
     user.push(req.body) // get request body and set that values to the user array at line [17]
 
+    const userModel = new UserModel({
+        username:req.body.username,
+        fName:req.body.fName,
+        lName:req.body.lName,
+        email:req.body.email,
+        password:req.body.password
+    })
+
+   await userModel.save();
     //set the response with the status code
-    res.status(500).send("ok")
+    res.status(201).send("user created success")
 })
 
 // create connection with mongodb using mongoose
