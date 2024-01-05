@@ -26,3 +26,7 @@ $ npm i cors express mongoose
    "ext" : ".ts,.js",
    "exec": "ts-node ./src/index.ts" says compile to the ts node
  }
+
+
+ // to install body parser library
+ $ npm i body-parser @types/body-parser
