@@ -8,6 +8,8 @@ const app =express();
 //Because routes are coming with the express
 app.get('/user/all', (req:express.Request , res:express.Response) => {
 
+    //the response that we need to send back when request is coming
+    res.send("Hello");
 });
 
 
