@@ -133,7 +133,15 @@ app.post("/user/auth", async (req: express.Request, res: express.Response) => {
 /* -------------------------------------------------article---------------------------------------------------------- */
 
 
-app.post("/article", async (req: express.Request, res: express.Response) => {
+/*
+    decoding and verify the JWT token through middleware functions
+    custom middlewear
+*/
+const verifyToken = (req:express.Request,res:any,next:express.NextFunction) => {
+
+}
+
+app.post("/article", verifyToken,async (req: express.Request, res: express.Response) => {
     try {
 
         let req_body = req.body;
