@@ -30,3 +30,5 @@ $ npm i cors express mongoose
 
  // to install body parser library
  $ npm i body-parser @types/body-parser
+
+ npm i js
