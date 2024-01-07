@@ -1,9 +1,11 @@
-import express, {response} from "express";
+import express from "express";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import userModel from "./models/user.model";
+import mongoose, {Schema, Types} from "mongoose";
 import UserModel from "./models/user.model";
 import CustomeResponse from "./dtos/custome.response";
+import ArticleModel from "./models/article.model";
+import {ObjectId} from "mongodb";
+
 //invoking the express
 const app = express();
 
@@ -19,7 +21,9 @@ interface user {
     password: string
 }
 
-let user: user[] = [];
+
+/*-------------------------------------------------------- users ---------------------------------------------------- */
+//let user: user[] = [];
 
 //in node js this is not the endpoint this called as the routes
 //Because routes are coming with the express
@@ -37,12 +41,12 @@ app.get('/user/all', async (req: express.Request, res: express.Response) => {
         //the response that we need to send back when request is coming
         //res.send("Hello");
 
-        const users = await  userModel.find();
+        const users = await UserModel.find();
 
         res.send(
-            new CustomeResponse(200,"suceess" , users)
+            new CustomeResponse(200, "suceess", users)
         );
-    }catch (error) {
+    } catch (error) {
         res.status(500).send(error);
     }
 });
@@ -69,7 +73,7 @@ app.post('/user', async (req: express.Request, res: express.Response) => {
             password: req.body.password
         })
 
-        const user=await userModel.save();
+        const user = await userModel.save();
         user.password = "" /* set password to empty string to send response */
         //set the response with the status code
         res.status(201).send("user created success")
@@ -80,35 +84,56 @@ app.post('/user', async (req: express.Request, res: express.Response) => {
 })
 
 
-app.post("/user/auth",async (req: express.Request, res: express.Response) => {
+app.post("/user/auth", async (req: express.Request, res: express.Response) => {
 
-    try{
-        const user = await UserModel.findOne({email:req.body.email})
+    try {
+        const user = await UserModel.findOne({email: req.body.email})
         console.log("a")
-        if (user){
+        if (user) {
             console.log("a")
-            if (user.password === req.body.password){
-                res.send(new CustomeResponse(200,"access").toJson());
+            if (user.password === req.body.password) {
+                res.send(new CustomeResponse(200, "access", user).toJson());
                 // new CustomeResponse(200,"access")
-            }else {
-                res.send(new CustomeResponse(200,"wrong credentials").toJson())
-                new CustomeResponse(200,"wrong credentials")
+            } else {
+                res.send(new CustomeResponse(401, "wrong credentials").toJson())
+                //new CustomeResponse(200,"wrong credentials")
             }
-        }else{
-            res.send(new CustomeResponse(200,"user not found"))
+        } else {
+            res.send(new CustomeResponse(404, "user not found"))
             // new CustomeResponse(200,"user not found")
         }
 
-    }catch (error){
+    } catch (error) {
         res.status(500).send(error)
     }
 
 });
 
 
-/* article */
+/* -------------------------------------------------article---------------------------------------------------------- */
 
 
+app.post("/article", async (req: express.Request, res: express.Response) => {
+    try {
+
+        let req_body = req.body;
+        const articleModel = new ArticleModel({
+            title: req_body.title,
+            description: req_body.description,
+            user: new ObjectId(req_body.user)
+        })
+
+        await articleModel.save();
+        res.status(200).send(
+            new CustomeResponse(200,"article saved success")
+        )
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(new CustomeResponse(500, "can not create article").toJson())
+    }
+})
 
 
 // create connection with mongodb using mongoose
