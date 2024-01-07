@@ -130,7 +130,6 @@ app.post("/article", async (req: express.Request, res: express.Response) => {
 
 
     } catch (error) {
-        console.log(error)
         res.status(500).send(new CustomeResponse(500, "can not create article").toJson())
     }
 })
