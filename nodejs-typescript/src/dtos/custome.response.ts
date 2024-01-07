@@ -3,12 +3,14 @@ export default class CustomeResponse {
     private _status:number;
     private _message:string;
     private _data:any
+    private _totalPages?:any
 
 
-    constructor(status: number, message: string, data?: any) {
+    constructor(status: number, message: string, data?: any, totalPages?:any) {
         this._status = status;
         this._message = message;
         this._data = data;
+        this._totalPages = totalPages;
     }
 
 
@@ -40,7 +42,8 @@ export default class CustomeResponse {
         return {
             status:this._status,
             message:this._message,
-            data:this._data
+            data:this._data,
+            totalPages:this._totalPages
         }
     }
 }
