@@ -10,6 +10,7 @@ import CustomeResponse from "./dtos/custome.response";
 import ArticleModel from "./models/article.model";
 import {ObjectId} from "mongodb";
 import * as process from "process";
+import jwt, {Secret} from 'jsonwebtoken'
 
 //invoking the express
 const app = express();
@@ -93,19 +94,33 @@ app.post("/user/auth", async (req: express.Request, res: express.Response) => {
 
     try {
         const user = await UserModel.findOne({email: req.body.email})
-        console.log("a")
         if (user) {
             console.log("a")
             if (user.password === req.body.password) {
-                res.send(new CustomeResponse(200, "access", user).toJson());
-                // new CustomeResponse(200,"access")
+                user.password = "";
+
+                //token gen
+                let expiresIn = "1w"
+                jwt.sign({user},process.env.SECRET as Secret, {expiresIn},(error:any , token:any) => {
+
+                    if (error){
+                        res.status(100).send(new CustomeResponse(100,"something wen wrong"));
+                    }else{
+                        let res_body = {
+                            user:user,
+                            accessToken:token
+                        }
+                        res.send(new CustomeResponse(200, "access", res_body).toJson());
+                    }
+                });
+
             } else {
                 res.send(new CustomeResponse(401, "wrong credentials").toJson())
-                //new CustomeResponse(200,"wrong credentials")
+
             }
         } else {
             res.send(new CustomeResponse(404, "user not found"))
-            // new CustomeResponse(200,"user not found")
+
         }
 
     } catch (error) {

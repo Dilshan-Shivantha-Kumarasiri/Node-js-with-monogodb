@@ -37,3 +37,8 @@ $ npm i cors express mongoose
  install environment variable count
    npm i dotenv
 
+
+ /// installing json web token
+ npm i -D @types/jsonwebtoken
+ npm i jsonwebtoken
+
