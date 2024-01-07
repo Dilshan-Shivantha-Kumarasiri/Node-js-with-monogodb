@@ -1,3 +1,7 @@
+//adding environment variable
+import dotenv from "dotenv"
+dotenv.config();
+
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose, {Schema, Types} from "mongoose";
@@ -5,6 +9,7 @@ import UserModel from "./models/user.model";
 import CustomeResponse from "./dtos/custome.response";
 import ArticleModel from "./models/article.model";
 import {ObjectId} from "mongodb";
+import * as process from "process";
 
 //invoking the express
 const app = express();
@@ -138,29 +143,63 @@ app.post("/article", async (req: express.Request, res: express.Response) => {
     }
 })
 
-app.get("/article",async (req,res) => {
-    try{
+app.get("/article", async (req: express.Request, res: express.Response) => {
+    try {
 
         //catching the query param
         // console.log(req.query);
-        let req_query:any = req.query;
-        let size:number = req_query.size;
-        let page:number = req_query.page;
+        let req_query: any = req.query;
+        let size: number = req_query.size;
+        let page: number = req_query.page;
 
         //add pagination
-      let articles  = await ArticleModel.find().limit(size).skip(size * (page-1));
-      let documentCount = await ArticleModel.countDocuments();
-      let pageCount =  Math.ceil(documentCount/size);
-      res.status(200).send(
-          new CustomeResponse(200,"success",articles,pageCount)
-      );
-    }catch (e) {
+        let articles = await ArticleModel.find().limit(size).skip(size * (page - 1));
+        let documentCount = await ArticleModel.countDocuments();
+        let pageCount = Math.ceil(documentCount / size);
+        res.status(200).send(
+            new CustomeResponse(200, "success", articles, pageCount)
+        );
+    } catch (e) {
 
     }
 })
 
+app.get("/articles/:userName", async(req, res) => {
+    try {
+
+        //console.log(req.params)
+        const username: any = req.params.userName;
+        let req_query: any = req.query;
+        let size: number = req_query.size;
+        let page: number = req_query.page;
+
+        //find the user avaialbel with the user name
+        let users = await UserModel.findOne({username:username});
+        if (!users) {
+            res.send(new CustomeResponse(404,"user not found"))//new CustomeResponse(404,"user not found");
+        }else {
+
+
+           // @ts-ignore
+            let articles = await ArticleModel.find({user: users._id}).limit(size).skip(size * (page-1));
+            let documentCount = await ArticleModel.countDocuments({user: users._id})
+            let pageCount = Math.ceil(documentCount/size);
+
+            res.status(200).send(new CustomeResponse(200,
+                'articles found success',articles,pageCount));
+        }
+
+        res.send("ok")
+
+
+    } catch (error) {
+
+    }
+})
+
+
 // create connection with mongodb using mongoose
-mongoose.connect("mongodb://localhost/blog");
+mongoose.connect(process.env.MONGO_URL as string);
 const db = mongoose.connection;
 
 //show error if not connected to the mongodb
