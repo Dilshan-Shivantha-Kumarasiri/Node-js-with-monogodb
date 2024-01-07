@@ -123,10 +123,14 @@ app.post("/article", async (req: express.Request, res: express.Response) => {
             user: new ObjectId(req_body.user)
         })
 
-        await articleModel.save();
-        res.status(200).send(
-            new CustomeResponse(200,"article saved success")
-        )
+        await articleModel.save().then(r => {
+
+            res.status(200).send(
+                new CustomeResponse(200, "article saved success")
+            )
+        }).catch(error => {
+            res.status(500).send(new CustomeResponse(500, "can not create article").toJson())
+        });
 
 
     } catch (error) {
@@ -134,6 +138,16 @@ app.post("/article", async (req: express.Request, res: express.Response) => {
     }
 })
 
+app.get("/article",async (req,res) => {
+    try{
+      let articles  = await ArticleModel.find();
+      res.status(200).send(
+          new CustomeResponse(200,"success",articles)
+      );
+    }catch (e) {
+
+    }
+})
 
 // create connection with mongodb using mongoose
 mongoose.connect("mongodb://localhost/blog");
