@@ -11,6 +11,7 @@ import ArticleModel from "./models/article.model";
 import {ObjectId} from "mongodb";
 import * as process from "process";
 import jwt, {Jwt, Secret, verify} from 'jsonwebtoken'
+import * as schemaType from "./types/schem.types"
 
 //invoking the express
 const app = express();
@@ -47,7 +48,7 @@ app.get('/user/all', async (req: express.Request, res: express.Response) => {
         //the response that we need to send back when request is coming
         //res.send("Hello");
 
-        const users = await UserModel.find();
+        const users:schemaType.Iuser[] = await UserModel.find();
 
         res.send(
             new CustomeResponse(200, "suceess", users)
@@ -79,7 +80,7 @@ app.post('/user', async (req: express.Request, res: express.Response) => {
             password: req.body.password
         })
 
-        const user = await userModel.save();
+        const user:schemaType.Iuser = await userModel.save();
         user.password = "" /* set password to empty string to send response */
         //set the response with the status code
         res.status(201).send("user created success")

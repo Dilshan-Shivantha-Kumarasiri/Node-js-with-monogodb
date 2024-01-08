@@ -1,15 +1,11 @@
 import mongoose from "mongoose";
+import * as schemaType from "../types/schem.types"
+
 
 //we need to define schema
 //schema is the definition of the document
 
-interface Iuser{
-    username:string
-    fName:string
-    lName:string
-    email:string
-    password:string
-}
+
 
 const userSchema = new mongoose.Schema({
     username:{type:String , required: true},
@@ -21,6 +17,6 @@ const userSchema = new mongoose.Schema({
 
 //creating model using the schema
 //adding s to the user by mongoose
-const userModel = mongoose.model<Iuser>("user",userSchema);
+const userModel = mongoose.model<schemaType.Iuser>("user",userSchema);
 
 export default userModel;
