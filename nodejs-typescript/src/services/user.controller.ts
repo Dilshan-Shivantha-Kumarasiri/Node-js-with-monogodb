@@ -6,7 +6,8 @@ import * as schemaType from "../types/schem.types";
 import CustomeResponse from "../dtos/custome.response";
 import jwt, {Secret} from "jsonwebtoken";
 import process from "process";
-
+// @ts-ignore
+import bcrypt from "bcryptjs"
 export const saveUser = async (req: express.Request, res: express.Response) => {
 
     try {
@@ -15,18 +16,38 @@ export const saveUser = async (req: express.Request, res: express.Response) => {
         //console.log(req.body);
         //user.push(req.body) // get request body and set that values to the user array at line [17]
 
-        const userModel = new UserModel({
-            username: req.body.username,
-            fName: req.body.fName,
-            lName: req.body.lName,
-            email: req.body.email,
-            password: req.body.password
+
+        await bcrypt.hash(req.body.password, 8, async function (error:null|string , hash:string) {
+            if(error){
+                res.status(100).json("something wrong");
+            }else {
+                const userModel = new UserModel({
+                    username: req.body.username,
+                    fName: req.body.fName,
+                    lName: req.body.lName,
+                    email: req.body.email,
+                    password: hash
+                })
+                let user:schemaType.Iuser = await userModel.save();
+                // user.password = ""
+                res.status(201).send(
+                    new CustomeResponse(201,"success",user).toJson()
+                )
+            }
         })
 
-        const user:schemaType.Iuser = await userModel.save();
-        user.password = "" /* set password to empty string to send response */
+        // const userModel = new UserModel({
+        //     username: req.body.username,
+        //     fName: req.body.fName,
+        //     lName: req.body.lName,
+        //     email: req.body.email,
+        //     password: req.body.password
+        // })
+
+        // const user:schemaType.Iuser = await userModel.save();
+        /* set password to empty string to send response */
         //set the response with the status code
-        res.status(201).send("user created success")
+        //res.status(201).send("user created success")
     } catch (error) {
         res.status(500).send("can not save the user");
     }
@@ -60,8 +81,9 @@ export const authUser = async (req: express.Request, res: express.Response) => {
     try {
         const user = await UserModel.findOne({email: req.body.email})
         if (user) {
-            console.log("a")
-            if (user.password === req.body.password) {
+
+            let isMatch = await bcrypt.compare(req.body.password , user.password)
+            if (isMatch) {
                 user.password = "";
 
                 //token gen
@@ -94,7 +116,3 @@ export const authUser = async (req: express.Request, res: express.Response) => {
 
 }
 
-
-
-
-// user auth
