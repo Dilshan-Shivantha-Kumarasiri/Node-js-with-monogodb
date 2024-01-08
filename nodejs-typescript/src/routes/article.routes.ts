@@ -3,33 +3,35 @@ import ArticleModel from "../models/article.model";
 import {ObjectId} from "mongodb";
 import CustomeResponse from "../dtos/custome.response";
 import UserModel from "../models/user.model";
-import jwt, {Secret} from "jsonwebtoken";
-import process from "process";
+// import jwt, {Secret} from "jsonwebtoken";
+// import process from "process";
+import * as Middleware from "middleware"
+
 
 const router = express.Router();
 
-const verifyToken = (req:express.Request , res:any, next:express.NextFunction) => {
-    //get the access token from the header
-    const token = req.headers.authorization;
+// const verifyToken = (req:express.Request , res:any, next:express.NextFunction) => {
+//     //get the access token from the header
+//     const token = req.headers.authorization;
+//
+//     if (!token){
+//         //check the token is available
+//         return res.status(401).json('authorized denied')
+//     }
+//
+//     try {
+//         const data = jwt.verify(token, process.env.SECRET as Secret);
+//         // console.log(data);
+//         res.tokenData = data;
+//         next();
+//     }catch (e) {
+//         return res.staus(401).json('authorized denied')
+//     }
+//
+//
+// }
 
-    if (!token){
-        //check the token is available
-        return res.status(401).json('authorized denied')
-    }
-
-    try {
-        const data = jwt.verify(token, process.env.SECRET as Secret);
-        // console.log(data);
-        res.tokenData = data;
-        next();
-    }catch (e) {
-        return res.staus(401).json('authorized denied')
-    }
-
-
-}
-
-router.post("/article", verifyToken,async (req: express.Request, res: any|express.Response) => {
+router.post("/", Middleware.verifyToken,async (req: express.Request, res: any|express.Response) => {
     try {
 
         //console.log(res);
@@ -57,7 +59,7 @@ router.post("/article", verifyToken,async (req: express.Request, res: any|expres
     }
 })
 
-router.get("/article", async (req: express.Request, res: express.Response) => {
+router.get("/", async (req: express.Request, res: express.Response) => {
     try {
 
         //catching the query param
@@ -78,7 +80,7 @@ router.get("/article", async (req: express.Request, res: express.Response) => {
     }
 })
 
-router.get("/articles/my", verifyToken, async(req, res:any) => {
+router.get("/my", Middleware.verifyToken, async(req, res:any) => {
     try {
 
         //console.log(req.params)
@@ -111,7 +113,7 @@ router.get("/articles/my", verifyToken, async(req, res:any) => {
     }
 })
 
-router.put("articles",verifyToken ,async (req, res:any) =>{
+router.put("/",Middleware.verifyToken ,async (req, res:any) =>{
 
     const article_id = req.body.id;
 
