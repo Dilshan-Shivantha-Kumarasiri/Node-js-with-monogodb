@@ -11,6 +11,7 @@ import ArticleModel from "./models/article.model";
 import {ObjectId} from "mongodb";
 import * as process from "process";
 import jwt, {Jwt, Secret, verify} from 'jsonwebtoken'
+import * as schemaType from "./types/schem.types"
 
 //invoking the express
 const app = express();
@@ -47,7 +48,7 @@ app.get('/user/all', async (req: express.Request, res: express.Response) => {
         //the response that we need to send back when request is coming
         //res.send("Hello");
 
-        const users = await UserModel.find();
+        const users:schemaType.Iuser[] = await UserModel.find();
 
         res.send(
             new CustomeResponse(200, "suceess", users)
@@ -79,7 +80,7 @@ app.post('/user', async (req: express.Request, res: express.Response) => {
             password: req.body.password
         })
 
-        const user = await userModel.save();
+        const user:schemaType.Iuser|null = await userModel.save();
         user.password = "" /* set password to empty string to send response */
         //set the response with the status code
         res.status(201).send("user created success")
@@ -93,7 +94,7 @@ app.post('/user', async (req: express.Request, res: express.Response) => {
 app.post("/user/auth", async (req: express.Request, res: express.Response) => {
 
     try {
-        const user = await UserModel.findOne({email: req.body.email})
+        const user: schemaType.Iuser | null = await UserModel.findOne({email: req.body.email})
         if (user) {
             console.log("a")
             if (user.password === req.body.password) {
@@ -165,18 +166,18 @@ app.post("/article", verifyToken,async (req: express.Request, res: any|express.R
         const user_id = res.tokenData.user._id;
 
         let req_body = req.body;
-        const articleModel = new ArticleModel({
+        const articleModel: schemaType.IArticle|null = new ArticleModel({
             title: req_body.title,
             description: req_body.description,
             user: new ObjectId(user_id)
         })
 
-        await articleModel.save().then(r => {
+        await articleModel.save().then(() => {
 
             res.status(200).send(
                 new CustomeResponse(200, "article saved success")
             )
-        }).catch(error => {
+        }).catch(() => {
             res.status(500).send(new CustomeResponse(500, "can not create article").toJson())
         });
 
@@ -196,7 +197,7 @@ app.get("/article", async (req: express.Request, res: express.Response) => {
         let page: number = req_query.page;
 
         //add pagination
-        let articles = await ArticleModel.find().limit(size).skip(size * (page - 1));
+        let articles:schemaType.IArticle[]|null = await ArticleModel.find().limit(size).skip(size * (page - 1));
         let documentCount = await ArticleModel.countDocuments();
         let pageCount = Math.ceil(documentCount / size);
         res.status(200).send(
@@ -219,12 +220,12 @@ app.get("/articles/my", verifyToken, async(req, res:any) => {
         let user_id = res.tokenData.user._id;
 
         //find the user avaialbel with the user name
-        let users = await UserModel.findOne({_id:user_id});
+        let users:schemaType.Iuser|null|any = await UserModel.findOne({_id:user_id});
         if (!users) {
             res.send(new CustomeResponse(404,"user not found"))//new CustomeResponse(404,"user not found");
         }else {
             // @ts-ignore
-            let articles = await ArticleModel.find({user: users._id}).limit(size).skip(size * (page-1));
+            let articles:schemaType.IArticle[] = await ArticleModel.find({user: users._id}).limit(size).skip(size * (page-1));
             let documentCount = await ArticleModel.countDocuments({user: users._id})
             let pageCount = Math.ceil(documentCount/size);
 
