@@ -14,8 +14,14 @@ import jwt, {Jwt, Secret, verify} from 'jsonwebtoken'
 import * as schemaType from "./types/schem.types"
 import UserRoutes from "./routes/user.routes";
 import ArticleRoutes from "./routes/article.routes";
+import cors from "cors"
+
 //invoking the express
 const app = express();
+
+app.use(cors({
+    origin:"*"
+}));
 
 //applying middleware
 //invoking body-parser
@@ -142,26 +148,26 @@ interface user {
     decoding and verify the JWT token through middleware functions
     custom middlewear
 */
-const verifyToken = (req:express.Request , res:any, next:express.NextFunction) => {
-    //get the access token from the header
-    const token = req.headers.authorization;
-
-    if (!token){
-        //check the token is available
-        return res.status(401).json('authorized denied')
-    }
-
-    try {
-        const data = jwt.verify(token, process.env.SECRET as Secret);
-        // console.log(data);
-        res.tokenData = data;
-        next();
-    }catch (e) {
-        return res.staus(401).json('authorized denied')
-    }
-
-
-}
+// const verifyToken = (req:express.Request , res:any, next:express.NextFunction) => {
+//     //get the access token from the header
+//     const token = req.headers.authorization;
+//
+//     if (!token){
+//         //check the token is available
+//         return res.status(401).json('authorized denied')
+//     }
+//
+//     try {
+//         const data = jwt.verify(token, process.env.SECRET as Secret);
+//         // console.log(data);
+//         res.tokenData = data;
+//         next();
+//     }catch (e) {
+//         return res.staus(401).json('authorized denied')
+//     }
+//
+//
+// }
 //
 // app.post("/article", verifyToken,async (req: express.Request, res: any|express.Response) => {
 //     try {
