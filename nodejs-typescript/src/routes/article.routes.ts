@@ -5,7 +5,7 @@ import CustomeResponse from "../dtos/custome.response";
 import UserModel from "../models/user.model";
 // import jwt, {Secret} from "jsonwebtoken";
 // import process from "process";
-import * as Middleware from "middleware"
+import * as Middleware from "../middleware"
 
 
 const router = express.Router();
