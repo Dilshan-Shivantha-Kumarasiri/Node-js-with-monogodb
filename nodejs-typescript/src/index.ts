@@ -240,7 +240,7 @@ app.get("/articles/my", verifyToken, async(req, res:any) => {
     }
 })
 
-app.put("articles",verifyToken ,async (req, res:any) =>{
+app.put("/articles",verifyToken ,async (req, res:any) =>{
 
     const article_id = req.body.id;
 
@@ -250,7 +250,7 @@ app.put("articles",verifyToken ,async (req, res:any) =>{
 
         if(article){
 
-            await ArticleModel.findOneAndUpdate({_id:article_id},{title:req.body.titile , description:req.body.description}).
+            await ArticleModel.findOneAndUpdate({_id:article_id},{title:req.body.title , description:req.body.description}).
             then(r => {
                 res.status(200).send(new CustomeResponse(200,"article update success"))
             }).
@@ -265,9 +265,31 @@ app.put("articles",verifyToken ,async (req, res:any) =>{
     }catch (error) {
         res.status(500).json("error");
     }
-
-
 });
+
+app.delete("/article/:id", verifyToken , async(req , res: any) => {
+
+    try{
+
+        let user_id = res.tokenData.user._id;
+        let article_id = req.params.id
+
+        const article = await ArticleModel.find({_id:article_id , user:user_id})
+
+        if(article){
+            await ArticleModel.deleteOne({_id:article_id}).
+            then(r => {
+               res.status(200).send(new CustomeResponse(200,"item delete success").toJson())
+            }).catch(e => {
+                res.status(100).send(new CustomeResponse(100,"something went wrong").toJson())
+            });
+        }
+    }catch (error){
+        res.status(500).json("something went wrong");
+    }
+
+
+})
 
 /*
 app.get("/articles/:userName", async(req, res) => {
